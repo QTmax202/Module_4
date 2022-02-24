@@ -28,6 +28,7 @@
         <td th:text="${product.getPrice()}"></td>
         <td th:text="${product.getDescription()}"></td>
         <td th:text="${product.getCategory().getC_name()}"></td>
+        <td><img th:src="@{${file} + ${product.getImage().getOriginalFilename()}}" alt="lỗi" src=""/></td>
     </tr>
     </tbody>
 </table>

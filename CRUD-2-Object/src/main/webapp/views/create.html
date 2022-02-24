@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -31,7 +30,7 @@
         <input type="file" name="image" th:field="*{image}">
     </label>
     <label>Category:
-        <select th:field="*{category}">
+        <select name="cate">
             <option th:each="c : ${categories}" th:value="${c.c_id}" th:text="${c.c_name}">
             </option>
         </select>

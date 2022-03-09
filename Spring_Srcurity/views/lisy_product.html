@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+        function getProduct(i, result) {
+            return `<tr>
+                                                <td>${i + 1}</td>
+                                                <td>${result[i].name}</td>
+                                                <td>${result[i].price}</td>
+                                                <td>${result[i].description}</td>
+                                                <td>${result[i].image}</td>
+                                                <td><a href="">Edit</a></td>
+                                                <td><button
+                                                onclick="removeProduct(${result[i].id})">
+                                                Delete</button></td>
+                                           </tr>`;
+        }
+
+        function getAllProduct() {
+            $.ajax({
+                url: `http://localhost:8080/products`,
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + currentUser.accessToken
+                },
+                success: function (result) {
+                    let content = "";
+                    for (let i = 0; i < result.length; i++) {
+                        content += getProduct(i, result)
+                    }
+                    document.getElementById("table-body").innerHTML = content;
+                },
+            }).fail(function (){
+                window.location.href = "/demo-m4/login.html";
+            });
+        }
+
+        function removeProduct(id) {
+            $.ajax({
+                url: `http://localhost:8080/products/${id}`,
+                headers: {
+                    'Authorization': 'Bearer ' + currentUser.accessToken
+                },
+                type: 'DELETE',
+                success: getAllProduct
+            }).fail(function (){
+                window.location.href = "/demo-m4/login.html";
+            });
+        }
+
+
+        $(document).ready(function () {
+            getAllProduct();
+        })
+    </script>
+</head>
+<body>
+<h1>List Product</h1>
+<form action="/product" method="get">
+    <input name="q" placeholder="search" type="text">
+    <button>Search</button>
+</form>
+<table>
+    <tr>
+        <td>#</td>
+        <td>Name</td>
+        <td>Price</td>
+        <td>Description</td>
+        <td>Image</td>
+        <td>Edit</td>
+        <td>Delete</td>
+    </tr>
+    <tbody id="table-body">
+    </tbody>
+</table>
+</body>
+</html>

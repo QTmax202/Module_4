@@ -1,59 +1,69 @@
 package com.example.spring_srcurity.controller;
 
+import com.example.spring_srcurity.model.Account;
 import com.example.spring_srcurity.model.JwtResponse;
-import com.example.spring_srcurity.model.Role;
-import com.example.spring_srcurity.model.User;
+import com.example.spring_srcurity.service.Account.IAccountService;
 import com.example.spring_srcurity.service.JwtService;
 import com.example.spring_srcurity.service.role.IRoleService;
-import com.example.spring_srcurity.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import javax.validation.Valid;
 
-@CrossOrigin("*")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
+@CrossOrigin("*")
 public class AuthController {
+
     @Autowired
-    private AuthenticationManager authenticationManager;
+    IAccountService accountService;
+
+    @Autowired
+    IRoleService roleService;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
 
     @Autowired
     private JwtService jwtService;
 
-    @Autowired
-    private IUserService userService;
+    @PostMapping("/signup")
+    public ResponseEntity<?> register(@Valid @RequestBody Account account) {
+        if(accountService.existsByGmail(account.getGmail())){
+            return new ResponseEntity<>("The username existed!", HttpStatus.OK);
+        }
+        Account appUser = new Account(account.getGmail(),passwordEncoder.encode(account.getPassword()),account.getRoles());
+        accountService.save(appUser);
+        return new ResponseEntity<>(appUser, HttpStatus.OK);
+    }
 
-    @Autowired
-    private IRoleService roleService;
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+    @PostMapping("/signIn")
+    public ResponseEntity<?> login(@RequestBody Account account) {
+        Authentication authentication = authenticationManager.authenticate
+                (new UsernamePasswordAuthenticationToken(account.getGmail(), account.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtService.generateTokenLogin(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        User currentUser = userService.findByUsername(user.getUsername()).get();
-        return ResponseEntity.ok(new JwtResponse(jwt, currentUser.getId(), userDetails.getUsername(), currentUser.getFullName(), userDetails.getAuthorities()));
+        Account currentUser = accountService.findByGmail(account.getGmail()).get();
+        JwtResponse jwtResponse = new JwtResponse(currentUser.getId(), jwt, userDetails.getUsername(), userDetails.getAuthorities());
+        return ResponseEntity.ok(jwtResponse);
     }
 
-    @GetMapping("/role/{id}")
-    public ResponseEntity<Optional<Role>> roleById(@RequestParam("id") Long id) {
-        Optional<Role> roles = roleService.findById(id);
-        return ResponseEntity.ok(roles);
+    @GetMapping("/hello")
+    public ResponseEntity<String> hello() {
+        return new ResponseEntity<>("Hello World", HttpStatus.OK);
     }
-
-//    @PostMapping("/saveAcc")
-//    private ResponseEntity<?> saveAcc(@RequestBody User user){
-//
-//    }
 }

@@ -8,24 +8,17 @@ public class JwtResponse {
     private Long id;
     private String token;
     private String type = "Bearer";
-    private String username;
-    private String name;
+    private String gmail;
     private Collection<? extends GrantedAuthority> roles;
 
-    public JwtResponse(String accessToken, Long id, String username, String name, Collection<? extends GrantedAuthority> roles) {
-        this.token = accessToken;
-        this.username = username;
-        this.roles = roles;
-        this.name = name;
+    public JwtResponse() {
+    }
+
+    public JwtResponse(Long id, String token, String gmail, Collection<? extends GrantedAuthority> roles) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        this.token = token;
+        this.gmail = gmail;
+        this.roles = roles;
     }
 
     public Long getId() {
@@ -36,31 +29,35 @@ public class JwtResponse {
         this.id = id;
     }
 
-    public String getAccessToken() {
+    public String getToken() {
         return token;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.token = accessToken;
+    public void setToken(String token) {
+        this.token = token;
     }
 
-    public String getTokenType() {
+    public String getType() {
         return type;
     }
 
-    public void setTokenType(String tokenType) {
-        this.type = tokenType;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return gmail;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String gmail) {
+        this.gmail = gmail;
     }
 
     public Collection<? extends GrantedAuthority> getRoles() {
         return roles;
+    }
+
+    public void setRoles(Collection<? extends GrantedAuthority> roles) {
+        this.roles = roles;
     }
 }

@@ -9,35 +9,34 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class UserPrinciple implements UserDetails {
-
+public class AccountPrinciple implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     private Long id;
 
-    private String username;
+    private String gmailAddress;
 
     private String password;
 
     private Collection<? extends GrantedAuthority> roles;
 
-    public UserPrinciple(Long id,
-                         String username, String password,
-                         Collection<? extends GrantedAuthority> roles) {
+    public AccountPrinciple(Long id,
+                            String gmailAddress, String password,
+                            Collection<? extends GrantedAuthority> roles) {
         this.id = id;
-        this.username = username;
+        this.gmailAddress = gmailAddress;
         this.password = password;
         this.roles = roles;
     }
 
-    public static UserPrinciple build(User user) {
+    public static AccountPrinciple build(Account user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
-                new SimpleGrantedAuthority(role.getName())
+                new SimpleGrantedAuthority(role.getRole())
         ).collect(Collectors.toList());
 
-        return new UserPrinciple(
+        return new AccountPrinciple(
                 user.getId(),
-                user.getUsername(),
+                user.getGmail(),
                 user.getPassword(),
                 authorities
         );
@@ -49,7 +48,7 @@ public class UserPrinciple implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return gmailAddress;
     }
 
     @Override
@@ -88,8 +87,8 @@ public class UserPrinciple implements UserDetails {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UserPrinciple user = (UserPrinciple) o;
-        return Objects.equals(id, user.id);
+        AccountPrinciple acc = (AccountPrinciple) o;
+        return Objects.equals(id, acc.id);
     }
 
     @Override

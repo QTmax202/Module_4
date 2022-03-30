@@ -1,13 +1,13 @@
 package com.example.spring_srcurity.service;
 
-
-import com.example.spring_srcurity.model.UserPrinciple;
+import com.example.spring_srcurity.model.AccountPrinciple;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
 import java.util.Date;
 
 @Component
@@ -18,7 +18,7 @@ public class JwtService {
     private static final Logger logger = LoggerFactory.getLogger(JwtService.class.getName());
 
     public String generateTokenLogin(Authentication authentication) {
-        UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
+        AccountPrinciple userPrincipal = (AccountPrinciple) authentication.getPrincipal();
 
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
@@ -28,7 +28,7 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean validateJwtToken(String authToken) {
+    public boolean validateToken(String authToken) {
         try {
             Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(authToken);
             return true;
